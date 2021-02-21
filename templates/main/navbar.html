@@ -1,0 +1,63 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href=" {% url 'home' %} ">Twitx</a>
+    <button class="navbar-toggler" data-target="#my-nav" data-toggle="collapse" aria-controls="my-nav"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-align-right"></i>
+    </button>
+    <div id="my-nav" class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+
+            {% if request.user.is_authenticated %}
+            <li class="nav-item ">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+            </li>
+            {% endif %}
+
+            {% if request.user.is_authenticated  %}
+            <li class="nav-item">
+                <a class="nav-link " href="{% url 'profile' request.user.profile.slug %}">Profile</a>
+            </li>
+            {% endif %}
+
+            {% if request.user.is_authenticated  %}
+            <li class="nav-item">
+                <a class="nav-link " href=" {% url 'notification' request.user.profile.slug %} ">
+                    Notification {% if not_f %}
+                    <span class="badge badge-danger">{{not_f.count}}</span>
+                    {% endif %}
+                </a>
+            </li>
+            {% endif %}
+
+            <li class="nav-item ">
+                <a class="nav-link" href="{% url 'twitx' %}">Random Posts</a>
+            </li>
+            {% if request.user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link " href="{% url 'logout' %}">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link " href="{% url 'login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " href="{% url 'register' %}">Register</a>
+            </li>
+            {% endif %}
+
+
+
+
+
+        </ul>
+        <link rel="stylesheet" type="text/css" href="{% static 'main/' %}css/dark-mode.css">
+        <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="darkSwitch" />
+            <label class="custom-control-label" for="darkSwitch">Dark Mode</label>
+        </div>
+        <script type="text/javascript" src="{% static 'main/' %}js/dark-mode-switch.js"></script>
+    </div>
+
+
+</nav>

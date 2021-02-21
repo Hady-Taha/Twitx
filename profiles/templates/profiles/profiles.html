@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-6">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <img src="{{profile.photo.url}}" width="100" height="100" class="rounded-circle" alt="...">
+                    {{profile.user.username}}
+                </h5>
+
+                {% if profile.bio %}
+                <p class="card-text">{{profile.bio}}</p>
+                {% else %}
+                <p class="card-text"></p>
+                {% endif %}
+
+
+            </div>
+            <ul class="list-group list-group-flush">
+                <button type="button" class="list-group-item bg-light text-left" data-toggle="modal"
+                    data-target="#followers">followers : {{profile.get_all_follower_count}}</button>
+                <button type="button" class="list-group-item bg-light text-left" data-toggle="modal"
+                    data-target="#following">following :{{profile.get_all_following_count}}</button>
+            </ul>
+            <div class="card-body bg-light">
+                {% if request.user == profile.user %}
+                <a href="{% url 'settings' request.user.profile.slug %}"
+                    class="btn btn-sm btn-primary mr-2">Settings</a>
+                {% endif %}
+                {% if request.user == profile.user %}
+                {{''}}
+                {% else %}
+                <form method="POST">
+                    {% csrf_token %}
+                    {% if profile.user in request.user.profile.follow.all %}
+                    <button class="btn btn-sm btn-danger mr-2 rounded-pill">Un follow {{profile.user}}</button>
+                    {% else %}
+                    <button class="btn btn-sm btn-primary mr-2 rounded-pill">follow</button>
+                    {% endif %}
+                </form>
+                {% endif %}
+                <p class="mt-2">last Login {{profile.user.last_login}}</p>
+            </div>
+
+        </div>
+    </div>
+    <div class="col">
+        <h4 class="text-center">Posts</h4>
+        {% if posts %}
+        {% for post in posts %}
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <form data-url="{% url 'like_unlike' %}" method='POST' id="{{post.id}}" class="like">
+                    {% csrf_token %}
+                    <input type="hidden" name="post_id" value="{{post.id}}">
+                    <button type="submit" class="btn float-right">
+                        {% if  request.user.profile in post.get_all_likes %}
+                        <i class="fa fa-heart p-1" id="like_icon{{post.id}}" style="color: chocolate;">
+                            {{post.get_all_likes_count}}
+                        </i>
+                        {% else %}
+                        <i class="far fa-heart p-1" id="like_icon{{post.id}}" style="color: chocolate;">
+                            {{post.get_all_likes_count}}
+                        </i>
+                        {% endif %}
+                    </button>
+                </form>
+                <blockquote class="blockquote mb-0">
+                    <p>{{post.body}}</p>
+                    <footer class="blockquote-footer">
+                        <img src="{{post.user.photo.url}}" width="20" height="20" class="rounded-circle" alt="">
+                        <a href="{% url 'profile' post.user.slug  %}">@{{post.user}}</a>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <h6 class="text-center rounded-lg">this user don't have any post</h6>
+        {% endif %}
+    </div>
+
+
+
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="followers" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">followers</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% for follower in  profile.get_all_follower %}
+                    <p>
+                        <a href="{% url 'profile' follower.sender %}">
+                            <img src="{{follower.sender.photo.url}}" class="rounded-circle" width="20" height="20"
+                                alt="">
+                            {{follower.sender}}
+                        </a>
+                    </p>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="following" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">following</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% for following in  profile.get_all_following %}
+                    <p>
+                        <a href="{% url 'profile' following.receiver %}">
+                            <img src="{{following.receiver.photo.url}}" class="rounded-circle" width="20" height="20"
+                                alt="">
+                            {{following.receiver}}
+                        </a>
+                    </p>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

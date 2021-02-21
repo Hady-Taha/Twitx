@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col">
+        {% for post in posts %}
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-end">
+                    {% if request.user.is_authenticated  %}
+
+                    <form data-url="{% url 'like_unlike' %}" method='POST' id="{{post.id}}" class="like">
+                        {% csrf_token %}
+                        <input type="hidden" name="post_id" value="{{post.id}}">
+
+                        <button type="submit" class="btn float-right">
+                            <div class="spinner-border float-right  spinner{{post.id}}  spinner-border-sm  text-danger"
+                                style="display: none;" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            {% if  request.user.profile in post.get_all_likes %}
+                            <i class="fa fa-heart" id="like_icon{{post.id}}" style="color: chocolate;"></i>
+                            <p id="text{{post.id}}" class="text-dark" style="display: inline;">
+                                {{post.get_all_likes_count}}</p>
+                            {% else %}
+                            <i class="far fa-heart" id="like_icon{{post.id}}" style="color: chocolate;"></i>
+                            <p id="text{{post.id}}" class="text-dark" style="display: inline;">{{post.get_all_likes_count}}</p>
+                            {% endif %}
+                            
+                        </button>
+
+                    </form>
+                    {% endif %}
+                </div>
+
+                <blockquote class="blockquote mb-0">
+                    <p>{{post.body}}</p>
+                    <footer class="blockquote-footer">
+                        <img src="{{post.user.photo.url}}" width="20" height="20" class="rounded-circle" alt="">
+                        <a href="{% url 'profile' post.user.slug  %}">@{{post.user}}</a>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}
